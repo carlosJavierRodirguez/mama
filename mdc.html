@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz dia</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle, #ffd6e8, #ffb6d9);
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      position: relative;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .scene {
+      width: 300px;
+      height: 400px;
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 105%;
+      height: 105%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s ease;
+    }
+
+    .card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .card-front {
+      background: #ffccd5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #d6336c;
+      padding: 20px;
+    }
+
+    .card-back {
+      background: white;
+      transform: rotateY(180deg);
+      padding: 20px;
+      text-align: center;
+      color: #444;
+    }
+
+    .card-back h1 {
+      color: #d6336c;
+      margin-top: 30px;
+    }
+
+    .card-back p {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    .flower {
+      margin-top: 30px;
+      font-size: 30px;
+    }
+
+    .toggle-btn,
+    .audio-button {
+      margin-top: 20px;
+      background: #ff85a2;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .toggle-btn:hover,
+    .audio-button:hover {
+      background: #d6336c;
+    }
+
+    @media (max-width: 400px) {
+      .scene {
+        width: 90vw;
+        height: 60vh;
+      }
+
+      .card {
+        width: 100%;
+        height: 100%;
+      }
+
+      .card-front,
+      .card-back {
+        font-size: 18px;
+        padding: 15px;
+      }
+
+      .toggle-btn,
+      .audio-button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+
+    .audio-container {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #burst-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .burst-heart {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      animation: burst 1s ease-out forwards;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    @keyframes burst {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="scene">
+      <div class="card" id="card">
+        <div class="card-face card-front">
+          💖 Querida mamá 💖
+        </div>
+        <div class="card-face card-back">
+          <h1>¡Feliz día de la madre!</h1>
+          <p>
+            De todos los regalos que la vida puede ofrecer,<br>
+            una madre amorosa es el más valioso de todos.<br>
+            Gracias, mamá, por apoyarme siempre y estar a mi lado.<br>
+            No hay palabras para expresar lo agradecido que estoy contigo.<br>
+            Te quiero con todo mi corazón.<br><br>
+            Atentamente,<br>
+            Tu hijo programador 🧑‍💻❤️
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleCard()">Abrir / Cerrar</button>
+
+    <div class="audio-container">
+      <audio id="audio" preload="auto">
+        <source src="Darius rucker - Wagon Wheel (Lyrics) [wjzYh36uMds].mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+      <button class="audio-button" onclick="toggleAudio()">Inicio / Pausa</button>
+    </div>
+  </div>
+
+  <!-- Heart burst container -->
+  <div id="burst-container"></div>
+
+  <script>
+    const card = document.getElementById('card');
+    const burstContainer = document.getElementById('burst-container');
+    const audio = document.getElementById('audio');
+
+    function toggleCard() {
+      const isFlipped = card.classList.contains('is-flipped');
+      card.classList.toggle('is-flipped');
+
+      if (!isFlipped) {
+        triggerHeartBurst();
+      }
+    }
+
+    function triggerHeartBurst() {
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'burst-heart';
+        heart.textContent = '❤️';
+
+        const x = (Math.random() - 0.5) * 200 + 'px';
+        const y = (Math.random() - 0.5) * 200 + 'px';
+
+        heart.style.left = '50%';
+        heart.style.top = '50%';
+        heart.style.setProperty('--x', x);
+        heart.style.setProperty('--y', y);
+        heart.style.fontSize = `${Math.random() * 25 + 30}px`;
+
+        burstContainer.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 1000);
+      }
+    }
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+  </script>
+</body>
+
+</html>
